@@ -2,7 +2,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
-from pagerank_utils import plot_pagerank_distribution
+from pagerank_utils import plot_all
 
 def parse_to_csr(filepath: str) -> tuple[csr_matrix, np.ndarray]:
     edges = pd.read_csv(
@@ -62,5 +62,6 @@ dataset = "data/web-BerkStan.txt"
 matrix, nodes = parse_to_csr(dataset)
 scores = pagerank_csr(matrix)
 result = pd.Series(scores, index=nodes)
-plot_pagerank_distribution(dataset, result)
+plot_all(dataset, result, matrix=matrix)
+
 print(result.nlargest(10))

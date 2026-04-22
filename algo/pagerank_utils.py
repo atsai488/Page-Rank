@@ -117,43 +117,162 @@ def pagerank_power_iteration(
     return normalize_distribution(rank)
 
 
-def plot_pagerank_distribution(filepath: str, scores: pd.Series | np.ndarray | dict) -> None:
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+from scipy.sparse import csr_matrix
+
+
+def _extract(scores: pd.Series | np.ndarray | dict) -> tuple[np.ndarray, np.ndarray]:
+    """Return (node_ids, values) from any scores input."""
     if isinstance(scores, dict):
-        values = np.array(list(scores.values()))
-        node_ids = np.array(list(scores.keys()))
+        return np.array(list(scores.keys())), np.array(list(scores.values()))
     elif isinstance(scores, pd.Series):
-        values = scores.values
-        node_ids = scores.index.to_numpy()
+        return scores.index.to_numpy(), scores.values
     else:
         values = np.asarray(scores)
-        node_ids = np.arange(len(values))
+        return np.arange(len(values)), values
 
-    # Sort by node ID for the left plot
-    sort_by_node = np.argsort(node_ids)
-    sorted_node_ids = node_ids[sort_by_node]
-    sorted_by_node = values[sort_by_node]
 
-    # Sort by score descending for the right plot
-    sort_by_score = np.argsort(values)[::-1]
-    ranked_scores = values[sort_by_score]
-    ranks = np.arange(1, len(ranked_scores) + 1)
+def plot_score_per_node(scores, ax=None, **kwargs):
+    """Node ID vs PageRank score (log y). Good for spotting outlier nodes."""
+    node_ids, values = _extract(scores)
+    order = np.argsort(node_ids)
+    ax = ax or plt.gca()
+    ax.plot(node_ids[order], values[order], linewidth=0.5, color="#1a1a4e", **kwargs)
+    ax.set_yscale("log")
+    ax.set_xlabel("Node ID")
+    ax.set_ylabel("PageRank score")
+    ax.set_title("Score per node")
+    return ax
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
-    axes[0].plot(sorted_node_ids, sorted_by_node, color="#1a1a4e", linewidth=0.5)
-    axes[0].set_xlabel("Node ID")
-    axes[0].set_ylabel("PageRank score")
-    axes[0].set_title("Score per node")
-    axes[0].set_yscale("log")
+def plot_rank_vs_score(scores, ax=None, **kwargs):
+    """Log-log rank vs score. A straight line indicates a power-law distribution."""
+    _, values = _extract(scores)
+    ranked = np.sort(values)[::-1]
+    ranks = np.arange(1, len(ranked) + 1)
+    ax = ax or plt.gca()
+    ax.loglog(ranks, ranked, linewidth=0.8, color="#1a1a4e", **kwargs)
+    ax.set_xlabel("Rank")
+    ax.set_ylabel("PageRank score")
+    ax.set_title("Rank vs score (log-log)")
+    return ax
 
-    axes[1].loglog(ranks, ranked_scores, color="#1a1a4e", linewidth=0.8)
-    axes[1].set_xlabel("Rank")
-    axes[1].set_ylabel("PageRank score")
-    axes[1].set_title("Rank vs score (log-log)")
+
+def plot_score_distribution(scores, bins=100, ax=None, **kwargs):
+    """Histogram of log10 scores. Shows where most nodes cluster."""
+    _, values = _extract(scores)
+    log_scores = np.log10(values[values > 0])
+    ax = ax or plt.gca()
+    ax.hist(log_scores, bins=bins, density=True, color="#1a1a4e", edgecolor="none", **kwargs)
+    ax.set_xlabel("log₁₀(PageRank score)")
+    ax.set_ylabel("Density")
+    ax.set_title("Score distribution")
+    return ax
+
+
+def plot_cumulative_distribution(scores, ax=None, **kwargs):
+    """CDF of PageRank scores. Shows what fraction of nodes fall below a given score."""
+    _, values = _extract(scores)
+    sorted_vals = np.sort(values)
+    cdf = np.arange(1, len(sorted_vals) + 1) / len(sorted_vals)
+    ax = ax or plt.gca()
+    ax.plot(sorted_vals, cdf, linewidth=0.8, color="#1a1a4e", **kwargs)
+    ax.set_xscale("log")
+    ax.set_xlabel("PageRank score")
+    ax.set_ylabel("Cumulative fraction")
+    ax.set_title("Cumulative distribution")
+    return ax
+
+
+def plot_top_n_nodes(scores, n=20, ax=None, **kwargs):
+    """Horizontal bar chart of the top-n nodes by PageRank score."""
+    node_ids, values = _extract(scores)
+    top_idx = np.argsort(values)[::-1][:n]
+    top_nodes = node_ids[top_idx].astype(str)
+    top_scores = values[top_idx]
+    ax = ax or plt.gca()
+    bars = ax.barh(top_nodes[::-1], top_scores[::-1], color="#1a1a4e", **kwargs)
+    ax.set_xlabel("PageRank score")
+    ax.set_ylabel("Node ID")
+    ax.set_title(f"Top {n} nodes")
+    ax.bar_label(bars, fmt="%.2e", padding=3, fontsize=7)
+    return ax
+
+
+def plot_score_vs_out_degree(scores, matrix: csr_matrix, ax=None, **kwargs):
+    """Scatter of out-degree vs PageRank score. Reveals whether degree predicts rank."""
+    _, values = _extract(scores)
+    out_degree = np.asarray(matrix.sum(axis=1)).flatten()
+    ax = ax or plt.gca()
+    ax.scatter(out_degree, values, s=1, alpha=0.3, color="#1a1a4e", rasterized=True, **kwargs)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel("Out-degree")
+    ax.set_ylabel("PageRank score")
+    ax.set_title("Score vs out-degree")
+    return ax
+
+
+def plot_score_vs_in_degree(scores, matrix: csr_matrix, ax=None, **kwargs):
+    """Scatter of in-degree vs PageRank score. In-degree is the stronger predictor."""
+    _, values = _extract(scores)
+    in_degree = np.asarray(matrix.sum(axis=0)).flatten()
+    ax = ax or plt.gca()
+    ax.scatter(in_degree, values, s=1, alpha=0.3, color="#1a1a4e", rasterized=True, **kwargs)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel("In-degree")
+    ax.set_ylabel("PageRank score")
+    ax.set_title("Score vs in-degree")
+    return ax
+
+
+def plot_score_concentration(scores, ax=None):
+    """Lorenz curve showing how concentrated PageRank is among top nodes."""
+    _, values = _extract(scores)
+    sorted_vals = np.sort(values)
+    cumulative = np.cumsum(sorted_vals) / sorted_vals.sum()
+    x = np.linspace(0, 1, len(cumulative))
+    ax = ax or plt.gca()
+    ax.plot(x, cumulative, color="#1a1a4e", linewidth=0.8, label="PageRank")
+    ax.plot([0, 1], [0, 1], color="gray", linewidth=0.8, linestyle="--", label="Perfect equality")
+    ax.set_xlabel("Fraction of nodes")
+    ax.set_ylabel("Fraction of total PageRank")
+    ax.set_title("Lorenz curve (score concentration)")
+    ax.legend(fontsize=8)
+    return ax
+
+
+def plot_all(filepath: str, scores, matrix: csr_matrix = None) -> None:
+    """
+    Produce a full analysis dashboard — all 7 plots in one figure.
+    Pass matrix to include degree-vs-score scatter plots.
+    """
+    has_matrix = matrix is not None
+    n_plots = 8 if has_matrix else 6
+    ncols = 4 if has_matrix else 3
+    nrows = 2
+
+    fig = plt.figure(figsize=(ncols * 4, nrows * 4))
+    gs = gridspec.GridSpec(nrows, ncols, figure=fig, hspace=0.45, wspace=0.35)
+
+    plot_score_per_node(scores,        ax=fig.add_subplot(gs[0, 0]))
+    plot_rank_vs_score(scores,         ax=fig.add_subplot(gs[0, 1]))
+    plot_score_distribution(scores,    ax=fig.add_subplot(gs[0, 2]))
+    plot_cumulative_distribution(scores, ax=fig.add_subplot(gs[1, 0]))
+    plot_top_n_nodes(scores,           ax=fig.add_subplot(gs[1, 1]))
+    plot_score_concentration(scores,   ax=fig.add_subplot(gs[1, 2]))
+
+    if has_matrix:
+        plot_score_vs_out_degree(scores, matrix, ax=fig.add_subplot(gs[0, 3]))
+        plot_score_vs_in_degree(scores,  matrix, ax=fig.add_subplot(gs[1, 3]))
 
     dataset_name = os.path.splitext(os.path.basename(filepath))[0]
-    fig.suptitle(dataset_name, fontsize=13)
-    plt.tight_layout()
+    fig.suptitle(dataset_name, fontsize=14, y=1.01)
 
-    output_path = f"output/distributions/{dataset_name}.png"
+    output_path = f"output/{dataset_name}_analysis.png"
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
