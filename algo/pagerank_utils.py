@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Hashable, Iterable, Mapping
 from typing import Dict, Optional, TypeVar
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
 
 Node = TypeVar("Node", bound=Hashable)
 
@@ -111,3 +115,45 @@ def pagerank_power_iteration(
             break
 
     return normalize_distribution(rank)
+
+
+def plot_pagerank_distribution(filepath: str, scores: pd.Series | np.ndarray | dict) -> None:
+    if isinstance(scores, dict):
+        values = np.array(list(scores.values()))
+        node_ids = np.array(list(scores.keys()))
+    elif isinstance(scores, pd.Series):
+        values = scores.values
+        node_ids = scores.index.to_numpy()
+    else:
+        values = np.asarray(scores)
+        node_ids = np.arange(len(values))
+
+    # Sort by node ID for the left plot
+    sort_by_node = np.argsort(node_ids)
+    sorted_node_ids = node_ids[sort_by_node]
+    sorted_by_node = values[sort_by_node]
+
+    # Sort by score descending for the right plot
+    sort_by_score = np.argsort(values)[::-1]
+    ranked_scores = values[sort_by_score]
+    ranks = np.arange(1, len(ranked_scores) + 1)
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+    axes[0].plot(sorted_node_ids, sorted_by_node, color="#1a1a4e", linewidth=0.5)
+    axes[0].set_xlabel("Node ID")
+    axes[0].set_ylabel("PageRank score")
+    axes[0].set_title("Score per node")
+    axes[0].set_yscale("log")
+
+    axes[1].loglog(ranks, ranked_scores, color="#1a1a4e", linewidth=0.8)
+    axes[1].set_xlabel("Rank")
+    axes[1].set_ylabel("PageRank score")
+    axes[1].set_title("Rank vs score (log-log)")
+
+    dataset_name = os.path.splitext(os.path.basename(filepath))[0]
+    fig.suptitle(dataset_name, fontsize=13)
+    plt.tight_layout()
+
+    output_path = f"output/distributions/{dataset_name}.png"
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
