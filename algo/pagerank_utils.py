@@ -247,7 +247,7 @@ def plot_score_concentration(scores, ax=None):
     return ax
 
 
-def plot_all(filepath: str, scores, matrix: csr_matrix = None) -> None:
+def plot_all(filepath: str, technique: str, scores, matrix: csr_matrix = None) -> None:
     """
     Produce a full analysis dashboard — all 7 plots in one figure.
     Pass matrix to include degree-vs-score scatter plots.
@@ -272,7 +272,29 @@ def plot_all(filepath: str, scores, matrix: csr_matrix = None) -> None:
         plot_score_vs_in_degree(scores,  matrix, ax=fig.add_subplot(gs[1, 3]))
 
     dataset_name = os.path.splitext(os.path.basename(filepath))[0]
-    fig.suptitle(dataset_name, fontsize=14, y=1.01)
-
-    output_path = f"output/{dataset_name}_analysis.png"
+    fig.suptitle(f"{dataset_name} with {technique}", fontsize=14, y=1.01)
+    
+    output_path = f"output/{technique}/{dataset_name}_analysis.png"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    
+def parse_to_csr(filepath: str) -> tuple[csr_matrix, np.ndarray]:
+    edges = pd.read_csv(
+        filepath,
+        sep='\t',
+        comment='#',
+        names=['from', 'to'],
+        dtype={'from': 'int32', 'to': 'int32'},
+    )
+
+    sorted_nodes, inverse = np.unique(
+        np.concatenate([edges['from'].values, edges['to'].values]),
+        return_inverse=True,
+    )
+    n = len(sorted_nodes)
+    rows = inverse[:len(edges)]
+    cols = inverse[len(edges):]
+    data = np.ones(len(edges), dtype=np.float32)
+
+    matrix = csr_matrix((data, (rows, cols)), shape=(n, n))
+    return matrix, sorted_nodes

@@ -2,28 +2,8 @@ import warnings
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
-from pagerank_utils import plot_all
+from pagerank_utils import plot_all, parse_to_csr
 
-def parse_to_csr(filepath: str) -> tuple[csr_matrix, np.ndarray]:
-    edges = pd.read_csv(
-        filepath,
-        sep='\t',
-        comment='#',
-        names=['from', 'to'],
-        dtype={'from': 'int32', 'to': 'int32'},
-    )
-
-    sorted_nodes, inverse = np.unique(
-        np.concatenate([edges['from'].values, edges['to'].values]),
-        return_inverse=True,
-    )
-    n = len(sorted_nodes)
-    rows = inverse[:len(edges)]
-    cols = inverse[len(edges):]
-    data = np.ones(len(edges), dtype=np.float32)
-
-    matrix = csr_matrix((data, (rows, cols)), shape=(n, n))
-    return matrix, sorted_nodes
 
 
 def pagerank_csr(
@@ -62,6 +42,6 @@ dataset = "data/web-BerkStan.txt"
 matrix, nodes = parse_to_csr(dataset)
 scores = pagerank_csr(matrix)
 result = pd.Series(scores, index=nodes)
-plot_all(dataset, result, matrix=matrix)
+plot_all(dataset, "Power Iteration", result, matrix=matrix)
 
 print(result.nlargest(10))
