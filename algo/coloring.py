@@ -8,18 +8,14 @@ set_num_threads(min(16, os.cpu_count() or 1))
 
 
 @njit(parallel=True, cache=True)
-def gs_sweep(color_ptrs, color_nodes, indptr, indices, data, scores, dangling_term, rsp, n):
-    """One full Gauss-Seidel sweep: sequential over color classes, parallel within each."""
-    num_colors = len(color_ptrs) - 1
-    for c in range(num_colors):
-        start = color_ptrs[c]
-        end = color_ptrs[c + 1]
-        for k in prange(end - start):
-            j = color_nodes[start + k]
-            s = 0.0
-            for p in range(indptr[j], indptr[j + 1]):
-                s += data[p] * scores[indices[p]]
-            scores[j] = (1.0 - rsp) * (s + dangling_term) + rsp / n
+def gs_sweep_color(start, end, color_nodes, indptr, indices, data, scores, dangling_term, rsp, n):
+    """Parallel update for one color class. prange must be the outermost loop."""
+    for k in prange(end - start):
+        j = color_nodes[start + k]
+        s = 0.0
+        for p in range(indptr[j], indptr[j + 1]):
+            s += data[p] * scores[indices[p]]
+        scores[j] = (1.0 - rsp) * (s + dangling_term) + rsp / n
 
 
 @njit(cache=True)
@@ -82,13 +78,12 @@ def fast_coloring_csr(matrix: csr_matrix):
 def _warmup_jit():
     """Compile numba kernels on tiny dummy data so JIT doesn't count toward timing."""
     n = 4
-    dummy_ptrs = np.array([0, 2, 4], dtype=np.int32)
     dummy_nodes = np.arange(4, dtype=np.int32)
     dummy_indptr = np.zeros(n + 1, dtype=np.int32)
     dummy_indices = np.empty(0, dtype=np.int32)
     dummy_data = np.empty(0, dtype=np.float64)
     dummy_scores = np.ones(n, dtype=np.float64) / n
-    gs_sweep(dummy_ptrs, dummy_nodes, dummy_indptr, dummy_indices, dummy_data, dummy_scores, 0.0, 0.15, n)
+    gs_sweep_color(0, 4, dummy_nodes, dummy_indptr, dummy_indices, dummy_data, dummy_scores, 0.0, 0.15, n)
 
 
 def pagerank_coloring(
@@ -118,6 +113,8 @@ def pagerank_coloring(
 
     print("Warming up JIT...", flush=True)
     _warmup_jit()
+    # Pre-extract int pairs so the loop doesn't re-convert numpy scalars each iteration
+    color_ranges = [(int(color_ptrs[c]), int(color_ptrs[c + 1])) for c in range(num_colors)]
 
     scores = np.full(n, 1.0 / n, dtype=np.float64)
 
@@ -127,7 +124,8 @@ def pagerank_coloring(
         dangling_sum = dangling_mask @ scores
         dangling_term = dangling_sum / n
 
-        gs_sweep(color_ptrs, color_nodes, indptr, indices, data, scores, dangling_term, rsp, n)
+        for start, end in color_ranges:
+            gs_sweep_color(start, end, color_nodes, indptr, indices, data, scores, dangling_term, rsp, n)
 
         delta = np.linalg.norm(scores - old_scores, 1)
         if delta < epsilon:
