@@ -100,3 +100,9 @@ def test_ordering_in_simple_chain():
 
     assert_valid_pagerank(scores, 3)
     assert scores[2] > scores[1] > scores[0]
+
+def test_no_nan_or_inf():
+    matrix = build_csr(3, [(0,1),(1,2)])
+    scores = pagerank_csr(matrix)
+
+    assert np.isfinite(scores).all()
