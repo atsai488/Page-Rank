@@ -1,13 +1,10 @@
 import numpy as np
-import random
 from scipy.sparse import csr_matrix
-from typing import List, Set
-from pagerank_utils import plot_all, parse_to_csr
-import pandas as pd
 from numba import njit, prange, set_num_threads
 import time
 
-set_num_threads(16)
+import os
+set_num_threads(min(16, os.cpu_count() or 1))
 
 @njit(parallel=True, cache=True)
 def update_partition_parallel(partition, indptr, indices, data, scores, dangling_term, rsp, n):
@@ -59,6 +56,12 @@ def fast_coloring_csr(matrix: csr_matrix):
     n = sym.shape[0]
 
     deg = np.diff(indptr)
+
+    if n == 0 or deg.size == 0:
+        return []
+    if deg.max() == 0:
+        return [list(range(n))]
+
     order = np.argsort(-deg)   # high-degree first
     max_deg = int(deg.max())
 
@@ -120,10 +123,3 @@ def pagerank_coloring(
     print("Time for ONLY page rank", end_time - start_time)
     return scores
 
-dataset = "data/web-BerkStan.txt"
-matrix, nodes = parse_to_csr(dataset)
-scores = pagerank_coloring(matrix)
-result = pd.Series(scores, index=nodes)
-plot_all(dataset, "Graph Coloring", result, matrix=matrix)
-
-print(result.nlargest(10))
