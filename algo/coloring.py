@@ -1,27 +1,25 @@
 import numpy as np
+import os
 from scipy.sparse import csr_matrix
 from numba import njit, prange, set_num_threads
 import time
 
-import os
 set_num_threads(min(16, os.cpu_count() or 1))
 
+
 @njit(parallel=True, cache=True)
-def update_partition_parallel(partition, indptr, indices, data, scores, dangling_term, rsp, n):
-    out = np.empty(partition.size, dtype=np.float64)
-
-    for k in prange(partition.size):
-        j = partition[k]
-        s = 0.0
-
-        # Sum incoming contribution for node j from CSC column j
-        for p in range(indptr[j], indptr[j + 1]):
-            i = indices[p]
-            s += data[p] * scores[i]
-
-        out[k] = (1.0 - rsp) * (s + dangling_term) + rsp / n
-
-    return out
+def gs_sweep(color_ptrs, color_nodes, indptr, indices, data, scores, dangling_term, rsp, n):
+    """One full Gauss-Seidel sweep: sequential over color classes, parallel within each."""
+    num_colors = len(color_ptrs) - 1
+    for c in range(num_colors):
+        start = color_ptrs[c]
+        end = color_ptrs[c + 1]
+        for k in prange(end - start):
+            j = color_nodes[start + k]
+            s = 0.0
+            for p in range(indptr[j], indptr[j + 1]):
+                s += data[p] * scores[indices[p]]
+            scores[j] = (1.0 - rsp) * (s + dangling_term) + rsp / n
 
 
 @njit(cache=True)
@@ -47,7 +45,9 @@ def greedy_color_numba(indptr, indices, order, max_deg):
 
     return colors
 
+
 def fast_coloring_csr(matrix: csr_matrix):
+    """Returns (color_ptrs, color_nodes) flat CSR-style arrays."""
     sym = (matrix + matrix.T).tocsr()
     sym.data[:] = 1
 
@@ -58,21 +58,39 @@ def fast_coloring_csr(matrix: csr_matrix):
     deg = np.diff(indptr)
 
     if n == 0 or deg.size == 0:
-        return []
+        return np.zeros(1, dtype=np.int32), np.empty(0, dtype=np.int32)
     if deg.max() == 0:
-        return [list(range(n))]
+        return np.array([0, n], dtype=np.int32), np.arange(n, dtype=np.int32)
 
-    order = np.argsort(-deg)   # high-degree first
+    order = np.argsort(-deg).astype(np.int64)
     max_deg = int(deg.max())
 
     colors = greedy_color_numba(indptr, indices, order, max_deg)
 
     num_colors = int(colors.max()) + 1
-    partitions = [[] for _ in range(num_colors)]
-    for v, c in enumerate(colors):
-        partitions[c].append(v)
 
-    return partitions
+    # Build flat node list sorted by color, plus per-color pointer array.
+    color_nodes = np.argsort(colors, kind='stable').astype(np.int32)
+    color_ptrs = np.zeros(num_colors + 1, dtype=np.int32)
+    for c in colors:
+        color_ptrs[c + 1] += 1
+    np.cumsum(color_ptrs, out=color_ptrs)
+
+    return color_ptrs, color_nodes
+
+
+def _warmup_jit():
+    """Compile numba kernels on tiny dummy data so JIT doesn't count toward timing."""
+    n = 4
+    dummy_ptrs = np.array([0, 2, 4], dtype=np.int32)
+    dummy_nodes = np.arange(4, dtype=np.int32)
+    dummy_indptr = np.zeros(n + 1, dtype=np.int32)
+    dummy_indices = np.empty(0, dtype=np.int32)
+    dummy_data = np.empty(0, dtype=np.float64)
+    dummy_scores = np.ones(n, dtype=np.float64) / n
+    gs_sweep(dummy_ptrs, dummy_nodes, dummy_indptr, dummy_indices, dummy_data, dummy_scores, 0.0, 0.15, n)
+
+
 def pagerank_coloring(
     matrix: csr_matrix,
     rsp: float = 0.15,
@@ -89,37 +107,36 @@ def pagerank_coloring(
     diag = csr_matrix((inv_sums, (np.arange(n), np.arange(n))), shape=(n, n))
     P = (diag @ matrix).tocsc()
 
-    print("Running fast graph coloring...")
-    partitions = fast_coloring_csr(matrix)
-    print(f"Colored graph into {len(partitions)} partitions")
-
-    # Convert partitions once to numpy arrays for numba
-    partitions = [np.asarray(p, dtype=np.int32) for p in partitions]
-
-    scores = np.full(n, 1.0 / n, dtype=np.float64)
+    print("Running fast graph coloring...", flush=True)
+    color_ptrs, color_nodes = fast_coloring_csr(matrix)
+    num_colors = len(color_ptrs) - 1
+    print(f"Colored graph into {num_colors} partitions", flush=True)
 
     indptr = P.indptr
     indices = P.indices
     data = P.data
+
+    print("Warming up JIT...", flush=True)
+    _warmup_jit()
+
+    scores = np.full(n, 1.0 / n, dtype=np.float64)
+
     start_time = time.time()
     for iteration in range(max_iterations):
         old_scores = scores.copy()
         dangling_sum = dangling_mask @ scores
         dangling_term = dangling_sum / n
 
-        for part in partitions:
-            scores[part] = update_partition_parallel(
-                part, indptr, indices, data, scores, dangling_term, rsp, n
-            )
+        gs_sweep(color_ptrs, color_nodes, indptr, indices, data, scores, dangling_term, rsp, n)
 
         delta = np.linalg.norm(scores - old_scores, 1)
         if delta < epsilon:
-            print(f"Converged in {iteration + 1} iterations")
+            print(f"Converged in {iteration + 1} iterations", flush=True)
             break
     else:
         import warnings
         warnings.warn(f"Did not converge after {max_iterations} iterations")
+
     end_time = time.time()
     print("Time for ONLY page rank", end_time - start_time)
     return scores
-
