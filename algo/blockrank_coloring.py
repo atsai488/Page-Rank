@@ -1,6 +1,7 @@
 import os
 import time
 import warnings
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import numpy as np
 from numba import njit, prange, set_num_threads
@@ -94,12 +95,73 @@ def _pagerank_parallel_internal(
     return scores
 
 
+def _group_nodes_by_block(
+    block_assignments: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, list[np.ndarray]]:
+    """Build contiguous block IDs and grouped node indices in one pass."""
+    unique_blocks, node_block_idx = np.unique(block_assignments, return_inverse=True)
+
+    order = np.argsort(node_block_idx, kind="mergesort")
+    counts = np.bincount(node_block_idx, minlength=len(unique_blocks))
+    split_points = np.cumsum(counts)[:-1]
+    if len(split_points) == 0:
+        block_node_indices = [order]
+    else:
+        block_node_indices = np.split(order, split_points)
+
+    return unique_blocks, node_block_idx.astype(np.int32, copy=False), block_node_indices
+
+
+def _chunk_blocks(
+    block_node_indices: list[np.ndarray],
+    chunk_size: int,
+) -> list[list[np.ndarray]]:
+    """Split block index arrays into coarse chunks to reduce scheduler overhead."""
+    return [
+        block_node_indices[i : i + chunk_size]
+        for i in range(0, len(block_node_indices), chunk_size)
+    ]
+
+
+def _solve_local_block_chunk(
+    matrix: csr_matrix,
+    block_chunk: list[np.ndarray],
+    rsp: float,
+    epsilon: float,
+    max_iterations: int,
+) -> list[tuple[np.ndarray, np.ndarray]]:
+    """Solve local PR for a chunk of blocks and return (idx, scores) pairs."""
+    chunk_results: list[tuple[np.ndarray, np.ndarray]] = []
+
+    for idx in block_chunk:
+        block_size = len(idx)
+        if block_size == 0:
+            continue
+
+        sub = matrix[np.ix_(idx, idx)]
+        P_local, dang_local = _build_row_stochastic(sub)
+        local_pr = _pagerank_serial_internal(
+            P_local,
+            dang_local,
+            block_size,
+            rsp=rsp,
+            epsilon=epsilon,
+            max_iterations=max_iterations,
+        )
+        chunk_results.append((idx, local_pr))
+
+    return chunk_results
+
+
 def blockrank_coloring_csr(
     matrix: csr_matrix,
     block_assignments: np.ndarray,
     rsp: float = 0.15,
     epsilon: float = 1e-5,
     max_iterations: int = 20000,
+    local_parallel: bool = True,
+    local_workers: int | None = None,
+    local_chunk_size: int = 64,
 ) -> np.ndarray:
     """BlockRank with a parallel (coloring-style) Numba kernel.
 
@@ -120,14 +182,11 @@ def blockrank_coloring_csr(
 
     total_start = time.time()
 
-    unique_blocks = np.unique(block_assignments)
+    prep_start = time.time()
+    unique_blocks, node_block_idx, block_node_indices = _group_nodes_by_block(block_assignments)
     num_blocks = len(unique_blocks)
-
-    block_node_indices: list[np.ndarray] = []
-    block_id_map: dict[int, int] = {}
-    for bi, blk in enumerate(unique_blocks):
-        block_id_map[int(blk)] = bi
-        block_node_indices.append(np.where(block_assignments == blk)[0])
+    prep_end = time.time()
+    print(f"  Preprocess (group blocks):   {prep_end - prep_start:.4f}s")
 
     # ------------------------------------------------------------------
     # Step 1: local PageRank within each block (serial, matches blockrank.py)
@@ -135,19 +194,42 @@ def blockrank_coloring_csr(
     step1_start = time.time()
     local_scores = np.zeros(n, dtype=np.float64)
 
-    for bi in range(num_blocks):
-        idx = block_node_indices[bi]
-        block_size = len(idx)
-        if block_size == 0:
-            continue
+    if local_parallel and num_blocks > 1:
+        workers = local_workers if local_workers is not None else _n_threads
+        workers = max(1, workers)
+        chunk_size = max(1, local_chunk_size)
+        block_chunks = _chunk_blocks(block_node_indices, chunk_size)
 
-        sub = matrix[np.ix_(idx, idx)]
-        P_local, dang_local = _build_row_stochastic(sub)
-        local_pr = _pagerank_serial_internal(
-            P_local, dang_local, block_size,
-            rsp=rsp, epsilon=epsilon, max_iterations=max_iterations,
-        )
-        local_scores[idx] = local_pr
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [
+                executor.submit(
+                    _solve_local_block_chunk,
+                    matrix,
+                    chunk,
+                    rsp,
+                    epsilon,
+                    max_iterations,
+                )
+                for chunk in block_chunks
+            ]
+
+            for future in as_completed(futures):
+                for idx, local_pr in future.result():
+                    local_scores[idx] = local_pr
+    else:
+        for bi in range(num_blocks):
+            idx = block_node_indices[bi]
+            block_size = len(idx)
+            if block_size == 0:
+                continue
+
+            sub = matrix[np.ix_(idx, idx)]
+            P_local, dang_local = _build_row_stochastic(sub)
+            local_pr = _pagerank_serial_internal(
+                P_local, dang_local, block_size,
+                rsp=rsp, epsilon=epsilon, max_iterations=max_iterations,
+            )
+            local_scores[idx] = local_pr
 
     step1_end = time.time()
     print(f"  Step 1 (local PR per block): {step1_end - step1_start:.4f}s")
@@ -156,8 +238,6 @@ def blockrank_coloring_csr(
     # Step 2: block-level PageRank
     # ------------------------------------------------------------------
     step2_start = time.time()
-
-    node_block_idx = np.array([block_id_map[int(b)] for b in block_assignments])
 
     coo = matrix.tocoo()
     src_blocks = node_block_idx[coo.row]

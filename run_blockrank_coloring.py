@@ -18,6 +18,23 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--num-blocks", type=int, default=100)
     parser.add_argument("--epsilon", type=float, default=1e-5)
+    parser.add_argument(
+        "--disable-local-parallel",
+        action="store_true",
+        help="Disable Step 1 local block parallelism.",
+    )
+    parser.add_argument(
+        "--local-workers",
+        type=int,
+        default=None,
+        help="Worker thread count for Step 1 local block solves (default: auto).",
+    )
+    parser.add_argument(
+        "--local-chunk-size",
+        type=int,
+        default=64,
+        help="Number of blocks per Step 1 local task.",
+    )
     return parser.parse_args()
 
 
@@ -74,6 +91,9 @@ def main() -> None:
         rsp=0.15,
         epsilon=args.epsilon,
         max_iterations=20000,
+        local_parallel=not args.disable_local_parallel,
+        local_workers=args.local_workers,
+        local_chunk_size=args.local_chunk_size,
     )
     end_time = time.time()
     print(f"Time for BlockRank+Coloring: {end_time - start_time:.4f}s")
