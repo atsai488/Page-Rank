@@ -84,7 +84,8 @@ def main() -> None:
         f"Source: {block_source}"
     )
 
-    start_time = time.time()
+    # start_time = time.time()
+    print("Block rank with args")
     scores = blockrank_coloring_csr(
         matrix,
         block_assignments,
@@ -95,8 +96,8 @@ def main() -> None:
         local_workers=args.local_workers,
         local_chunk_size=args.local_chunk_size,
     )
-    end_time = time.time()
-    print(f"Time for BlockRank+Coloring: {end_time - start_time:.4f}s")
+    # end_time = time.time()
+    # print(f"Time for BlockRank+Coloring: {end_time - start_time:.4f}s")
 
     result = pd.Series(scores, index=nodes).sort_index()
 

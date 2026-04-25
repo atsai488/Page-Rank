@@ -280,7 +280,7 @@ def blockrank_coloring_csr(
     # Step 4: global refinement (the dominant cost — parallel kernel wins here)
     # ------------------------------------------------------------------
     step4_start = time.time()
-
+    epsilon = 1e-3
     P_full, dang_full = _build_row_stochastic(matrix)
     scores = _pagerank_parallel_internal(
         P_full, dang_full, n,

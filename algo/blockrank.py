@@ -244,7 +244,7 @@ def blockrank_csr(
     # Step 4: Full power iteration starting from the approximation
     # ------------------------------------------------------------------
     step4_start = time.time()
-
+    epsilon = 1e-3
     P_full, dang_full = _build_row_stochastic(matrix)
     scores = _pagerank_csr_internal(
         P_full, dang_full, n,
