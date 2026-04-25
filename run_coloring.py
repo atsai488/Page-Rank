@@ -1,19 +1,34 @@
 import time
+import argparse
+
 import pandas as pd
+
 from algo.coloring import pagerank_coloring
 from algo.pagerank_utils import parse_to_csr, plot_all
 
-dataset = "data/web-Google.txt"
 
-matrix, nodes = parse_to_csr(dataset)
+def parse_args() -> argparse.Namespace:
+	parser = argparse.ArgumentParser(description="Run graph-coloring PageRank.")
+	parser.add_argument("--dataset", default="data/web-Google.txt")
+	return parser.parse_args()
 
-start_time = time.time()
-scores = pagerank_coloring(matrix)
-end_time = time.time()
-print(f"Total time: {end_time - start_time:.4f}s")
 
-result = pd.Series(scores, index=nodes)
+def main() -> None:
+	args = parse_args()
 
-plot_all(dataset, "Graph Coloring", result, matrix=matrix)
+	matrix, nodes = parse_to_csr(args.dataset)
 
-print(result.nlargest(10))
+	start_time = time.time()
+	scores = pagerank_coloring(matrix)
+	end_time = time.time()
+	print(f"Total time: {end_time - start_time:.4f}s")
+
+	result = pd.Series(scores, index=nodes)
+
+	plot_all(args.dataset, "Graph Coloring", result, matrix=matrix)
+
+	print(result.nlargest(10))
+
+
+if __name__ == "__main__":
+	main()
