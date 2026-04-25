@@ -1,14 +1,37 @@
 from __future__ import annotations
 
+import os
 import time
 import warnings
 from collections import defaultdict
 from typing import Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
 import numpy as np
+from numba import njit, prange, set_num_threads
 from scipy.sparse import csr_matrix
 
 from algo.pagerank_utils import normalize_distribution, pagerank_power_iteration
+
+
+_numba_threads_env = os.environ.get("NUMBA_NUM_THREADS")
+if _numba_threads_env is not None:
+    _n_threads = max(1, int(_numba_threads_env))
+else:
+    _n_threads = max(1, int(os.environ.get("SLURM_CPUS_PER_TASK", os.cpu_count() or 1)))
+set_num_threads(_n_threads)
+
+
+@njit(parallel=True, cache=True)
+def _update_all_parallel(indptr, indices, data, scores, dangling_term, rsp, n):
+    """Numba parallel Jacobi update over CSC columns."""
+    out = np.empty(n, dtype=np.float64)
+    for j in prange(n):
+        s = 0.0
+        for p in range(indptr[j], indptr[j + 1]):
+            i = indices[p]
+            s += data[p] * scores[i]
+        out[j] = (1.0 - rsp) * (s + dangling_term) + rsp / n
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -23,6 +46,7 @@ def _pagerank_csr_internal(
     epsilon: float = 1e-5,
     max_iterations: int = 20000,
     start: np.ndarray | None = None,
+    use_numba_parallel: bool = False,
 ) -> np.ndarray:
     """Power iteration on a pre-normalized column-stochastic transpose matrix.
 
@@ -31,15 +55,38 @@ def _pagerank_csr_internal(
     ``P`` must already be row-stochastic (rows sum to 1 for non-dangling nodes).
     """
     scores = np.full(n, 1.0 / n, dtype=np.float64) if start is None else start.copy()
+    converged = False
 
-    for _ in range(max_iterations):
-        dangling_sum = dangling_mask @ scores
-        new_scores = (1 - rsp) * (P.T @ scores + dangling_sum / n) + rsp / n
-        delta = np.linalg.norm(new_scores - scores, 1)
-        scores = new_scores
-        if delta < epsilon:
-            break
+    if use_numba_parallel:
+        P_csc = P.tocsc()
+        indptr = P_csc.indptr
+        indices = P_csc.indices
+        data = P_csc.data
+
+        # Warm up JIT outside convergence timing semantics.
+        _ = _update_all_parallel(indptr, indices, data, scores, 0.0, rsp, n)
+
+        for _ in range(max_iterations):
+            dangling_term = (dangling_mask @ scores) / n
+            new_scores = _update_all_parallel(
+                indptr, indices, data, scores, dangling_term, rsp, n
+            )
+            delta = np.linalg.norm(new_scores - scores, 1)
+            scores = new_scores
+            if delta < epsilon:
+                converged = True
+                break
     else:
+        for _ in range(max_iterations):
+            dangling_sum = dangling_mask @ scores
+            new_scores = (1 - rsp) * (P.T @ scores + dangling_sum / n) + rsp / n
+            delta = np.linalg.norm(new_scores - scores, 1)
+            scores = new_scores
+            if delta < epsilon:
+                converged = True
+                break
+
+    if not converged:
         warnings.warn(f"PageRank did not converge after {max_iterations} iterations")
 
     return scores
@@ -57,12 +104,32 @@ def _build_row_stochastic(matrix: csr_matrix) -> tuple[csr_matrix, np.ndarray]:
     return P, dangling_mask
 
 
+def _group_nodes_by_block(
+    block_assignments: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, list[np.ndarray]]:
+    """Build contiguous block IDs and node indices in one pass."""
+    unique_blocks, node_block_idx = np.unique(block_assignments, return_inverse=True)
+
+    order = np.argsort(node_block_idx, kind="mergesort")
+    counts = np.bincount(node_block_idx, minlength=len(unique_blocks))
+    split_points = np.cumsum(counts)[:-1]
+    if len(split_points) == 0:
+        block_node_indices = [order]
+    else:
+        block_node_indices = np.split(order, split_points)
+
+    return unique_blocks, node_block_idx.astype(np.int32, copy=False), block_node_indices
+
+
 def blockrank_csr(
     matrix: csr_matrix,
     block_assignments: np.ndarray,
     rsp: float = 0.15,
     epsilon: float = 1e-5,
     max_iterations: int = 20000,
+    numba_parallel: bool = True,
+    numba_global_min_n: int = 200_000,
+    numba_local_min_n: int = 200_000,
 ) -> np.ndarray:
     """CSR-based BlockRank algorithm.
 
@@ -78,6 +145,12 @@ def blockrank_csr(
         Convergence threshold for power iteration.
     max_iterations : int
         Maximum number of power iteration steps.
+    numba_parallel : bool
+        If True, use Numba parallel kernel for sufficiently large solves.
+    numba_global_min_n : int
+        Minimum problem size for Numba in block/global solves.
+    numba_local_min_n : int
+        Minimum block size to use Numba in local block solves.
 
     Returns
     -------
@@ -89,15 +162,11 @@ def blockrank_csr(
 
     total_start = time.time()
 
-    unique_blocks = np.unique(block_assignments)
+    prep_start = time.time()
+    unique_blocks, node_block_idx, block_node_indices = _group_nodes_by_block(block_assignments)
     num_blocks = len(unique_blocks)
-
-    # Build a mapping from block ID -> array of node indices in that block
-    block_node_indices: list[np.ndarray] = []
-    block_id_map: dict[int, int] = {}  # original block label -> contiguous index
-    for bi, blk in enumerate(unique_blocks):
-        block_id_map[int(blk)] = bi
-        block_node_indices.append(np.where(block_assignments == blk)[0])
+    prep_end = time.time()
+    print(f"  Preprocess (group blocks):   {prep_end - prep_start:.4f}s")
 
     # ------------------------------------------------------------------
     # Step 1: Local PageRank within each block
@@ -117,6 +186,7 @@ def blockrank_csr(
         local_pr = _pagerank_csr_internal(
             P_local, dang_local, block_size,
             rsp=rsp, epsilon=epsilon, max_iterations=max_iterations,
+            use_numba_parallel=(numba_parallel and block_size >= numba_local_min_n),
         )
         local_scores[idx] = local_pr
 
@@ -127,9 +197,6 @@ def blockrank_csr(
     # Step 2: Build block-level transition matrix and compute BlockRank
     # ------------------------------------------------------------------
     step2_start = time.time()
-
-    # Map each node to its contiguous block index
-    node_block_idx = np.array([block_id_map[int(b)] for b in block_assignments])
 
     # Count edges between blocks by iterating over non-zero entries
     coo = matrix.tocoo()
@@ -147,6 +214,7 @@ def blockrank_csr(
     block_ranks = _pagerank_csr_internal(
         P_block, dang_block, num_blocks,
         rsp=rsp, epsilon=epsilon, max_iterations=max_iterations,
+        use_numba_parallel=(numba_parallel and num_blocks >= numba_global_min_n),
     )
 
     step2_end = time.time()
@@ -182,6 +250,7 @@ def blockrank_csr(
         P_full, dang_full, n,
         rsp=rsp, epsilon=epsilon, max_iterations=max_iterations,
         start=approx,
+        use_numba_parallel=(numba_parallel and n >= numba_global_min_n),
     )
 
     step4_end = time.time()

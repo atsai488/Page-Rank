@@ -20,6 +20,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rsp", type=float, default=0.15)
     parser.add_argument("--epsilon", type=float, default=1e-5)
     parser.add_argument("--max-iterations", type=int, default=20000)
+    parser.add_argument(
+        "--disable-numba-parallel",
+        action="store_true",
+        help="Disable Numba parallel kernel in BlockRank internals.",
+    )
+    parser.add_argument(
+        "--numba-global-min-n",
+        type=int,
+        default=200000,
+        help="Minimum size to use Numba parallel kernel for block/global solves.",
+    )
+    parser.add_argument(
+        "--numba-local-min-n",
+        type=int,
+        default=200000,
+        help="Minimum block size to use Numba parallel kernel for local solves.",
+    )
     return parser.parse_args()
 
 
@@ -76,6 +93,9 @@ def main() -> None:
         rsp=args.rsp,
         epsilon=args.epsilon,
         max_iterations=args.max_iterations,
+        numba_parallel=not args.disable_numba_parallel,
+        numba_global_min_n=args.numba_global_min_n,
+        numba_local_min_n=args.numba_local_min_n,
     )
     end_time = time.time()
     print(f"Time for BlockRank (CSR): {end_time - start_time:.4f}s")
