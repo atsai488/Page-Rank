@@ -4,7 +4,7 @@ from algo.blockrank import blockrank_csr
 from algo.pagerank_utils import parse_to_csr, plot_all
 import time
 
-dataset = "data/web-BerkStan.txt"
+dataset = "data/web-Google.txt"
 
 # Parse the dataset into a CSR matrix
 matrix, nodes = parse_to_csr(dataset)

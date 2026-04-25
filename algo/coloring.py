@@ -82,7 +82,6 @@ def pagerank_coloring(
     # Warm up Numba JIT before timing
     _ = update_all_parallel(indptr, indices, data, scores, 0.0, rsp, n)
 
-    start_time = time.time()
     for iteration in range(max_iterations):
         dangling_term = (dangling_mask @ scores) / n
         new_scores = update_all_parallel(indptr, indices, data, scores, dangling_term, rsp, n)
@@ -95,8 +94,6 @@ def pagerank_coloring(
         import warnings
         warnings.warn(f"Did not converge after {max_iterations} iterations")
 
-    end_time = time.time()
-    print("Time for ONLY page rank", end_time - start_time)
     return scores
 
 

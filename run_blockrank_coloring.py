@@ -6,7 +6,7 @@ import pandas as pd
 from algo.blockrank_coloring import blockrank_coloring_csr
 from algo.pagerank_utils import parse_to_csr, plot_all
 
-dataset = "data/web-BerkStan.txt"
+dataset = "data/web-Google.txt"
 
 matrix, nodes = parse_to_csr(dataset)
 n = matrix.shape[0]
