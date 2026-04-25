@@ -69,6 +69,8 @@ def _build_blocks_from_metadata(nodes: np.ndarray, metadata_path: str) -> np.nda
 def main() -> None:
     args = parse_args()
 
+    print(f"Args: {vars(args)}")
+
     matrix, nodes = parse_to_csr(args.dataset)
     n = matrix.shape[0]
 
@@ -84,8 +86,6 @@ def main() -> None:
         f"Source: {block_source}"
     )
 
-    # start_time = time.time()
-    print("Block rank with args")
     scores = blockrank_coloring_csr(
         matrix,
         block_assignments,
@@ -96,14 +96,12 @@ def main() -> None:
         local_workers=args.local_workers,
         local_chunk_size=args.local_chunk_size,
     )
-    # end_time = time.time()
-    # print(f"Time for BlockRank+Coloring: {end_time - start_time:.4f}s")
 
-    result = pd.Series(scores, index=nodes).sort_index()
+    # result = pd.Series(scores, index=nodes).sort_index()
 
-    plot_all(args.dataset, "BlockRank+Coloring", result, matrix=matrix)
+    # plot_all(args.dataset, "BlockRank+Coloring", result, matrix=matrix)
 
-    print(result.nlargest(10))
+    # print(result.nlargest(10))
 
 
 if __name__ == "__main__":
