@@ -11,8 +11,42 @@ from algo.pagerank_utils import parse_to_csr, plot_all
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run BlockRank+Coloring PageRank.")
     parser.add_argument("--dataset", default="data/web-Google.txt")
+    parser.add_argument(
+        "--metadata",
+        default=None,
+        help="Optional CSV with columns node_id and block_id for semantic blocks.",
+    )
     parser.add_argument("--num-blocks", type=int, default=100)
+    parser.add_argument("--epsilon", type=float, default=1e-5)
     return parser.parse_args()
+
+
+def _build_bucket_blocks(n: int, num_blocks: int) -> np.ndarray:
+    if num_blocks < 1:
+        raise ValueError("--num-blocks must be >= 1")
+    return np.arange(n) // (n // num_blocks + 1)
+
+
+def _build_blocks_from_metadata(nodes: np.ndarray, metadata_path: str) -> np.ndarray:
+    meta = pd.read_csv(metadata_path)
+    required_cols = {"node_id", "block_id"}
+    missing = required_cols.difference(meta.columns)
+    if missing:
+        raise ValueError(
+            f"Metadata file is missing required columns: {sorted(missing)}"
+        )
+
+    block_by_node = pd.Series(meta["block_id"].values, index=meta["node_id"].values)
+    aligned = block_by_node.reindex(nodes)
+    if aligned.isna().any():
+        missing_nodes = nodes[aligned.isna().to_numpy()]
+        preview = missing_nodes[:10].tolist()
+        raise ValueError(
+            "Metadata does not contain block_id for all parsed nodes. "
+            f"Missing {len(missing_nodes)} node(s), first few: {preview}"
+        )
+
+    return aligned.to_numpy(dtype=np.int64)
 
 
 def main() -> None:
@@ -21,16 +55,24 @@ def main() -> None:
     matrix, nodes = parse_to_csr(args.dataset)
     n = matrix.shape[0]
 
-    block_assignments = np.arange(n) // (n // args.num_blocks + 1)
+    if args.metadata:
+        block_assignments = _build_blocks_from_metadata(nodes, args.metadata)
+        block_source = f"metadata ({args.metadata})"
+    else:
+        block_assignments = _build_bucket_blocks(n, args.num_blocks)
+        block_source = f"index buckets ({args.num_blocks} target blocks)"
 
-    print(f"Nodes: {n}, Edges: {matrix.nnz}, Blocks: {len(np.unique(block_assignments))}")
+    print(
+        f"Nodes: {n}, Edges: {matrix.nnz}, Blocks: {len(np.unique(block_assignments))}, "
+        f"Source: {block_source}"
+    )
 
     start_time = time.time()
     scores = blockrank_coloring_csr(
         matrix,
         block_assignments,
         rsp=0.15,
-        epsilon=1e-5,
+        epsilon=args.epsilon,
         max_iterations=20000,
     )
     end_time = time.time()
