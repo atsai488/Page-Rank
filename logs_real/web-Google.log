@@ -1,0 +1,71 @@
+==================================================
+Dataset: data/web-Google.txt
+blocks=10, workers=4, chunk=64
+==================================================
+[Coloring]
+Converged in 104 iterations
+Total time: 1.0161s
+597621    0.000924
+41909     0.000921
+163075    0.000904
+537039    0.000899
+384666    0.000787
+504140    0.000765
+486980    0.000725
+605856    0.000718
+32163     0.000713
+558791    0.000709
+dtype: float64
+[BlockRank+Coloring]
+Args: {'dataset': 'data/web-Google.txt', 'metadata': None, 'num_blocks': 10, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 4, 'local_chunk_size': 64}
+Nodes: 875713, Edges: 5105039, Blocks: 10, Source: index buckets (10 target blocks)
+  Preprocess (group blocks):   0.0139s
+  Step 1 (local PR per block): 0.6293s
+  Step 2 (block-level PR):     0.1796s
+  Step 3 (build approximation): 0.0034s
+  Step 4 (global refinement):  0.2860s
+  Total BlockRank+Coloring time: 1.1122s
+597621    0.000925
+41909     0.000922
+163075    0.000905
+537039    0.000898
+384666    0.000787
+504140    0.000767
+486980    0.000728
+605856    0.000719
+32163     0.000715
+558791    0.000711
+dtype: float64
+[BlockRank]
+Nodes: 875713, Edges: 5105039, Blocks: 10, Source: index buckets (10 target blocks)
+  Preprocess (group blocks):   0.0136s
+  Step 1 (local PR per block): 0.6726s
+  Step 2 (block-level PR):     0.1788s
+  Step 3 (build approximation): 0.0035s
+  Step 4 (global refinement):  0.3767s
+  Total BlockRank time:        1.2452s
+597621    0.000925
+41909     0.000922
+163075    0.000905
+537039    0.000898
+384666    0.000787
+504140    0.000767
+486980    0.000728
+605856    0.000719
+32163     0.000715
+558791    0.000711
+dtype: float64
+[Basic]
+Time for power iteration 2.0427567958831787
+597621    0.000924
+41909     0.000921
+163075    0.000904
+537039    0.000899
+384666    0.000787
+504140    0.000765
+486980    0.000725
+605856    0.000718
+32163     0.000713
+558791    0.000709
+dtype: float64
+
