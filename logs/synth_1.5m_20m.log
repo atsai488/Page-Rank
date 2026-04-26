@@ -1,0 +1,73 @@
+==================================================
+Dataset: data/synth_1.5m_20m.txt
+Metadata: data/synth_1.5m_20m_nodes.csv
+workers=16, chunk=256, blocks=100
+==================================================
+[BlockRank+Coloring]
+Args: {'dataset': 'data/synth_1.5m_20m.txt', 'metadata': 'data/synth_1.5m_20m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 256}
+Nodes: 1500000, Edges: 19492604, Blocks: 100, Source: metadata (data/synth_1.5m_20m_nodes.csv)
+  Preprocess (group blocks):   0.0311s
+  Step 1 (local PR per block): 0.9741s
+  Step 2 (block-level PR):     0.5013s
+  Step 3 (build approximation): 0.0059s
+  Step 4 (global refinement):  0.4028s
+  Total BlockRank+Coloring time: 1.9153s
+124040     0.000002
+312288     0.000002
+1177360    0.000002
+353681     0.000002
+290447     0.000002
+1172667    0.000002
+1175280    0.000002
+322404     0.000002
+729593     0.000002
+380861     0.000002
+dtype: float64
+[BlockRank]
+Nodes: 1500000, Edges: 19492604, Blocks: 100, Source: metadata (data/synth_1.5m_20m_nodes.csv)
+  Preprocess (group blocks):   0.0298s
+  Step 1 (local PR per block): 0.9648s
+  Step 2 (block-level PR):     0.5062s
+  Step 3 (build approximation): 0.0060s
+  Step 4 (global refinement):  0.5466s
+  Total BlockRank time:        2.0535s
+Time for BlockRank (CSR): 2.0553s
+124040     0.000002
+312288     0.000002
+1177360    0.000002
+353681     0.000002
+290447     0.000002
+1172667    0.000002
+1175280    0.000002
+322404     0.000002
+729593     0.000002
+380861     0.000002
+dtype: float64
+[Coloring]
+Converged in 69 iterations
+Total time: 1.5442s
+124040     0.000002
+312288     0.000002
+1177360    0.000002
+290447     0.000002
+353681     0.000002
+1172667    0.000002
+1175280    0.000002
+322404     0.000002
+380861     0.000002
+729593     0.000002
+dtype: float64
+[Basic]
+Time for power iteration 4.3305823802948
+124040     0.000002
+312288     0.000002
+1177360    0.000002
+290447     0.000002
+353681     0.000002
+1172667    0.000002
+1175280    0.000002
+322404     0.000002
+380861     0.000002
+729593     0.000002
+dtype: float64
+

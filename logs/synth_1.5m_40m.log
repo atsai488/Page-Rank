@@ -1,0 +1,73 @@
+==================================================
+Dataset: data/synth_1.5m_40m.txt
+Metadata: data/synth_1.5m_40m_nodes.csv
+workers=16, chunk=256, blocks=100
+==================================================
+[BlockRank+Coloring]
+Args: {'dataset': 'data/synth_1.5m_40m.txt', 'metadata': 'data/synth_1.5m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 256}
+Nodes: 1500000, Edges: 38969600, Blocks: 100, Source: metadata (data/synth_1.5m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0311s
+  Step 1 (local PR per block): 1.3535s
+  Step 2 (block-level PR):     1.0098s
+  Step 3 (build approximation): 0.0056s
+  Step 4 (global refinement):  0.6925s
+  Total BlockRank+Coloring time: 3.0926s
+911368     0.000001
+1082131    0.000001
+508318     0.000001
+630985     0.000001
+1041813    0.000001
+1218857    0.000001
+249252     0.000001
+450756     0.000001
+452394     0.000001
+941604     0.000001
+dtype: float64
+[BlockRank]
+Nodes: 1500000, Edges: 38969600, Blocks: 100, Source: metadata (data/synth_1.5m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0297s
+  Step 1 (local PR per block): 1.3835s
+  Step 2 (block-level PR):     1.0179s
+  Step 3 (build approximation): 0.0070s
+  Step 4 (global refinement):  0.8450s
+  Total BlockRank time:        3.2831s
+Time for BlockRank (CSR): 3.2857s
+911368     0.000001
+1082131    0.000001
+508318     0.000001
+630985     0.000001
+1041813    0.000001
+1218857    0.000001
+249252     0.000001
+450756     0.000001
+452394     0.000001
+941604     0.000001
+dtype: float64
+[Coloring]
+Converged in 67 iterations
+Total time: 2.1234s
+911368     0.000001
+1082131    0.000001
+508318     0.000001
+630985     0.000001
+1041813    0.000001
+1218857    0.000001
+249252     0.000001
+450756     0.000001
+452394     0.000001
+941604     0.000001
+dtype: float64
+[Basic]
+Time for power iteration 7.432613849639893
+911368     0.000001
+1082131    0.000001
+508318     0.000001
+630985     0.000001
+1041813    0.000001
+1218857    0.000001
+249252     0.000001
+450756     0.000001
+452394     0.000001
+941604     0.000001
+dtype: float64
+

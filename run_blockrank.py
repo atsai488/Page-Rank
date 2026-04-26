@@ -86,7 +86,6 @@ def main() -> None:
         f"Source: {block_source}"
     )
 
-    start_time = time.time()
     scores = blockrank_csr(
         matrix,
         block_assignments,
@@ -97,8 +96,6 @@ def main() -> None:
         numba_global_min_n=args.numba_global_min_n,
         numba_local_min_n=args.numba_local_min_n,
     )
-    end_time = time.time()
-    print(f"Time for BlockRank (CSR): {end_time - start_time:.4f}s")
 
     result = pd.Series(scores, index=nodes).sort_index()
     plot_all(args.dataset, "BlockRank", result, matrix=matrix)

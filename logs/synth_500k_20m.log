@@ -1,0 +1,73 @@
+==================================================
+Dataset: data/synth_500k_20m.txt
+Metadata: data/synth_500k_20m_nodes.csv
+workers=16, chunk=256, blocks=100
+==================================================
+[BlockRank+Coloring]
+Args: {'dataset': 'data/synth_500k_20m.txt', 'metadata': 'data/synth_500k_20m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 256}
+Nodes: 500000, Edges: 19926690, Blocks: 100, Source: metadata (data/synth_500k_20m_nodes.csv)
+  Preprocess (group blocks):   0.0129s
+  Step 1 (local PR per block): 0.6139s
+  Step 2 (block-level PR):     0.5026s
+  Step 3 (build approximation): 0.0022s
+  Step 4 (global refinement):  0.2864s
+  Total BlockRank+Coloring time: 1.4180s
+497340    0.000004
+129688    0.000003
+198114    0.000003
+84454     0.000003
+482801    0.000003
+288600    0.000003
+261038    0.000003
+42263     0.000003
+48364     0.000003
+169027    0.000003
+dtype: float64
+[BlockRank]
+Nodes: 500000, Edges: 19926690, Blocks: 100, Source: metadata (data/synth_500k_20m_nodes.csv)
+  Preprocess (group blocks):   0.0109s
+  Step 1 (local PR per block): 0.6439s
+  Step 2 (block-level PR):     0.5026s
+  Step 3 (build approximation): 0.0020s
+  Step 4 (global refinement):  0.4386s
+  Total BlockRank time:        1.5980s
+Time for BlockRank (CSR): 1.5998s
+497340    0.000004
+129688    0.000003
+198114    0.000003
+84454     0.000003
+482801    0.000003
+288600    0.000003
+261038    0.000003
+42263     0.000003
+48364     0.000003
+169027    0.000003
+dtype: float64
+[Coloring]
+Converged in 68 iterations
+Total time: 0.8989s
+497340    0.000004
+129688    0.000003
+198114    0.000003
+84454     0.000003
+482801    0.000003
+288600    0.000003
+261038    0.000003
+42263     0.000003
+48364     0.000003
+169027    0.000003
+dtype: float64
+[Basic]
+Time for power iteration 2.955202102661133
+497340    0.000004
+129688    0.000003
+198114    0.000003
+84454     0.000003
+482801    0.000003
+288600    0.000003
+261038    0.000003
+42263     0.000003
+48364     0.000003
+169027    0.000003
+dtype: float64
+

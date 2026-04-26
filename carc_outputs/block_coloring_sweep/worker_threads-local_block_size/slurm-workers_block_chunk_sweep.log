@@ -1,0 +1,365 @@
+==========================================
+SLURM_JOB_ID = 8366636
+SLURM_JOB_NODELIST = b01-03
+TMPDIR = /tmp/SLURM_8366636
+==========================================
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=4
+local-chunk-size=32
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 4, 'local_chunk_size': 32}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0462s
+  Step 1 (local PR per block): 2.9644s
+  Step 2 (block-level PR):     0.9873s
+  Step 3 (build approximation): 0.0122s
+  Step 4 (global refinement):  0.9453s
+  Total BlockRank+Coloring time: 4.9555s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=4
+local-chunk-size=64
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 4, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0433s
+  Step 1 (local PR per block): 2.8006s
+  Step 2 (block-level PR):     0.9869s
+  Step 3 (build approximation): 0.0128s
+  Step 4 (global refinement):  0.6267s
+  Total BlockRank+Coloring time: 4.4705s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=4
+local-chunk-size=128
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 4, 'local_chunk_size': 128}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0437s
+  Step 1 (local PR per block): 2.9588s
+  Step 2 (block-level PR):     0.9955s
+  Step 3 (build approximation): 0.0106s
+  Step 4 (global refinement):  0.6295s
+  Total BlockRank+Coloring time: 4.6381s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=4
+local-chunk-size=256
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 4, 'local_chunk_size': 256}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0434s
+  Step 1 (local PR per block): 2.9533s
+  Step 2 (block-level PR):     0.9975s
+  Step 3 (build approximation): 0.0130s
+  Step 4 (global refinement):  0.6342s
+  Total BlockRank+Coloring time: 4.6414s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=8
+local-chunk-size=32
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 8, 'local_chunk_size': 32}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0441s
+  Step 1 (local PR per block): 3.0243s
+  Step 2 (block-level PR):     0.9930s
+  Step 3 (build approximation): 0.0108s
+  Step 4 (global refinement):  0.6309s
+  Total BlockRank+Coloring time: 4.7032s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=8
+local-chunk-size=64
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 8, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0440s
+  Step 1 (local PR per block): 3.1197s
+  Step 2 (block-level PR):     0.9778s
+  Step 3 (build approximation): 0.0109s
+  Step 4 (global refinement):  0.6194s
+  Total BlockRank+Coloring time: 4.7718s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=8
+local-chunk-size=128
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 8, 'local_chunk_size': 128}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0435s
+  Step 1 (local PR per block): 3.2064s
+  Step 2 (block-level PR):     0.9868s
+  Step 3 (build approximation): 0.0119s
+  Step 4 (global refinement):  0.6280s
+  Total BlockRank+Coloring time: 4.8767s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=8
+local-chunk-size=256
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 8, 'local_chunk_size': 256}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0435s
+  Step 1 (local PR per block): 2.9927s
+  Step 2 (block-level PR):     0.9909s
+  Step 3 (build approximation): 0.0105s
+  Step 4 (global refinement):  0.6411s
+  Total BlockRank+Coloring time: 4.6788s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=12
+local-chunk-size=32
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 12, 'local_chunk_size': 32}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0449s
+  Step 1 (local PR per block): 3.7693s
+  Step 2 (block-level PR):     0.9981s
+  Step 3 (build approximation): 0.0140s
+  Step 4 (global refinement):  0.6772s
+  Total BlockRank+Coloring time: 5.5037s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=12
+local-chunk-size=64
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 12, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0451s
+  Step 1 (local PR per block): 3.1320s
+  Step 2 (block-level PR):     0.9857s
+  Step 3 (build approximation): 0.0108s
+  Step 4 (global refinement):  0.6281s
+  Total BlockRank+Coloring time: 4.8018s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=12
+local-chunk-size=128
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 12, 'local_chunk_size': 128}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0445s
+  Step 1 (local PR per block): 3.0916s
+  Step 2 (block-level PR):     0.9858s
+  Step 3 (build approximation): 0.0106s
+  Step 4 (global refinement):  0.6260s
+  Total BlockRank+Coloring time: 4.7586s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=12
+local-chunk-size=256
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 12, 'local_chunk_size': 256}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0435s
+  Step 1 (local PR per block): 3.5248s
+  Step 2 (block-level PR):     0.9859s
+  Step 3 (build approximation): 0.0127s
+  Step 4 (global refinement):  0.6235s
+  Total BlockRank+Coloring time: 5.1906s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=16
+local-chunk-size=32
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 32}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0429s
+  Step 1 (local PR per block): 3.1406s
+  Step 2 (block-level PR):     0.9744s
+  Step 3 (build approximation): 0.0105s
+  Step 4 (global refinement):  0.6170s
+  Total BlockRank+Coloring time: 4.7856s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=16
+local-chunk-size=64
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0428s
+  Step 1 (local PR per block): 3.0990s
+  Step 2 (block-level PR):     0.9867s
+  Step 3 (build approximation): 0.0105s
+  Step 4 (global refinement):  0.6341s
+  Total BlockRank+Coloring time: 4.7732s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=16
+local-chunk-size=128
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 128}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0441s
+  Step 1 (local PR per block): 3.1108s
+  Step 2 (block-level PR):     0.9937s
+  Step 3 (build approximation): 0.0108s
+  Step 4 (global refinement):  0.6364s
+  Total BlockRank+Coloring time: 4.7959s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=16
+local-chunk-size=256
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 256}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0438s
+  Step 1 (local PR per block): 3.0356s
+  Step 2 (block-level PR):     0.9840s
+  Step 3 (build approximation): 0.0104s
+  Step 4 (global refinement):  0.6278s
+  Total BlockRank+Coloring time: 4.7017s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=24
+local-chunk-size=32
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 24, 'local_chunk_size': 32}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0440s
+  Step 1 (local PR per block): 3.1344s
+  Step 2 (block-level PR):     0.9815s
+  Step 3 (build approximation): 0.0105s
+  Step 4 (global refinement):  0.6231s
+  Total BlockRank+Coloring time: 4.7936s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=24
+local-chunk-size=64
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 24, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0435s
+  Step 1 (local PR per block): 3.5467s
+  Step 2 (block-level PR):     0.9897s
+  Step 3 (build approximation): 0.0109s
+  Step 4 (global refinement):  0.6247s
+  Total BlockRank+Coloring time: 5.2155s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=24
+local-chunk-size=128
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 24, 'local_chunk_size': 128}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0442s
+  Step 1 (local PR per block): 3.0807s
+  Step 2 (block-level PR):     0.9854s
+  Step 3 (build approximation): 0.0105s
+  Step 4 (global refinement):  0.6205s
+  Total BlockRank+Coloring time: 4.7413s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=24
+local-chunk-size=256
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 24, 'local_chunk_size': 256}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0433s
+  Step 1 (local PR per block): 3.0033s
+  Step 2 (block-level PR):     0.9958s
+  Step 3 (build approximation): 0.0106s
+  Step 4 (global refinement):  0.6289s
+  Total BlockRank+Coloring time: 4.6820s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=32
+local-chunk-size=32
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 32, 'local_chunk_size': 32}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0436s
+  Step 1 (local PR per block): 3.5631s
+  Step 2 (block-level PR):     0.9814s
+  Step 3 (build approximation): 0.0125s
+  Step 4 (global refinement):  0.6176s
+  Total BlockRank+Coloring time: 5.2183s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=32
+local-chunk-size=64
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 32, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0436s
+  Step 1 (local PR per block): 3.4095s
+  Step 2 (block-level PR):     0.9833s
+  Step 3 (build approximation): 0.0106s
+  Step 4 (global refinement):  0.6184s
+  Total BlockRank+Coloring time: 5.0655s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=32
+local-chunk-size=128
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 32, 'local_chunk_size': 128}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0433s
+  Step 1 (local PR per block): 3.1013s
+  Step 2 (block-level PR):     0.9992s
+  Step 3 (build approximation): 0.0105s
+  Step 4 (global refinement):  0.6318s
+  Total BlockRank+Coloring time: 4.7862s
+==================================================
+Running BlockRank+Coloring sweep
+dataset=data/synth_2m_40m.txt
+metadata=data/synth_2m_40m_nodes.csv
+local-workers=32
+local-chunk-size=256
+==================================================
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 32, 'local_chunk_size': 256}
+Nodes: 2000000, Edges: 39679152, Blocks: 2000, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0439s
+  Step 1 (local PR per block): 2.9280s
+  Step 2 (block-level PR):     0.9970s
+  Step 3 (build approximation): 0.0105s
+  Step 4 (global refinement):  0.6427s
+  Total BlockRank+Coloring time: 4.6222s

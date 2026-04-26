@@ -1,0 +1,73 @@
+==================================================
+Dataset: data/synth_2m_40m.txt
+Metadata: data/synth_2m_40m_nodes.csv
+workers=16, chunk=256, blocks=100
+==================================================
+[BlockRank+Coloring]
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 16, 'local_chunk_size': 256}
+Nodes: 2000000, Edges: 39982089, Blocks: 100, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0434s
+  Step 1 (local PR per block): 1.4102s
+  Step 2 (block-level PR):     1.0399s
+  Step 3 (build approximation): 0.0095s
+  Step 4 (global refinement):  0.7352s
+  Total BlockRank+Coloring time: 3.2383s
+1722450    1.072778e-06
+1222406    1.072245e-06
+1097438    1.055843e-06
+283358     1.055209e-06
+995620     1.048998e-06
+149590     1.046618e-06
+1038289    1.020463e-06
+541580     1.018624e-06
+240935     1.003032e-06
+1343798    9.986239e-07
+dtype: float64
+[BlockRank]
+Nodes: 2000000, Edges: 39982089, Blocks: 100, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0423s
+  Step 1 (local PR per block): 1.3647s
+  Step 2 (block-level PR):     1.0370s
+  Step 3 (build approximation): 0.0092s
+  Step 4 (global refinement):  0.8718s
+  Total BlockRank time:        3.3250s
+Time for BlockRank (CSR): 3.3275s
+1722450    1.072778e-06
+1222406    1.072245e-06
+1097438    1.055843e-06
+283358     1.055209e-06
+995620     1.048998e-06
+149590     1.046618e-06
+1038289    1.020463e-06
+541580     1.018624e-06
+240935     1.003032e-06
+1343798    9.986239e-07
+dtype: float64
+[Coloring]
+Converged in 66 iterations
+Total time: 2.3894s
+1722450    1.072783e-06
+1222406    1.072315e-06
+1097438    1.055620e-06
+283358     1.055113e-06
+995620     1.048793e-06
+149590     1.046737e-06
+1038289    1.020042e-06
+541580     1.019045e-06
+240935     1.003056e-06
+1343798    9.989409e-07
+dtype: float64
+[Basic]
+Time for power iteration 7.777812480926514
+1722450    1.072783e-06
+1222406    1.072315e-06
+1097438    1.055620e-06
+283358     1.055113e-06
+995620     1.048793e-06
+149590     1.046737e-06
+1038289    1.020042e-06
+541580     1.019045e-06
+240935     1.003056e-06
+1343798    9.989409e-07
+dtype: float64
+

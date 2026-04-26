@@ -97,11 +97,11 @@ def main() -> None:
         local_chunk_size=args.local_chunk_size,
     )
 
-    # result = pd.Series(scores, index=nodes).sort_index()
+    result = pd.Series(scores, index=nodes).sort_index()
 
-    # plot_all(args.dataset, "BlockRank+Coloring", result, matrix=matrix)
+    plot_all(args.dataset, "BlockRank+Coloring", result, matrix=matrix)
 
-    # print(result.nlargest(10))
+    print(result.nlargest(10))
 
 
 if __name__ == "__main__":
