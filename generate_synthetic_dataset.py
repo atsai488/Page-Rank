@@ -124,13 +124,6 @@ def _out_degree(
     return max(1, int(rng.poisson(avg_out_degree)))
 
 
-def _target_out_degree(node_id: int, total_nodes: int, target_edges: int) -> int:
-    """Deterministically distribute an exact edge budget across nodes."""
-    base = target_edges // total_nodes
-    remainder = target_edges % total_nodes
-    return base + (1 if node_id < remainder else 0)
-
-
 def generate_edge_list_streaming(
     edge_path: Path,
     hosts: List[HostInfo],
@@ -138,7 +131,6 @@ def generate_edge_list_streaming(
     domain_ends: np.ndarray,
     total_nodes: int,
     avg_out_degree: int,
-    target_edges: int | None,
     degree_model: str,
     p_same_subdomain: float,
     p_same_domain_other_subdomain: float,
@@ -167,10 +159,7 @@ def generate_edge_list_streaming(
             has_cross_domain = (total_nodes - domain_size) > 0
 
             for src in range(host_start, host_end):
-                if target_edges is not None:
-                    out_deg = _target_out_degree(src, total_nodes, target_edges)
-                else:
-                    out_deg = _out_degree(degree_model, avg_out_degree, rng)
+                out_deg = _out_degree(degree_model, avg_out_degree, rng)
 
                 for _ in range(out_deg):
                     x = float(rng.random())
@@ -220,7 +209,6 @@ def _write_edge_shard(
     domain_ends: np.ndarray,
     total_nodes: int,
     avg_out_degree: int,
-    target_edges: int | None,
     degree_model: str,
     p_same_subdomain: float,
     p_same_domain_other_subdomain: float,
@@ -248,10 +236,7 @@ def _write_edge_shard(
             has_cross_domain = (total_nodes - domain_size) > 0
 
             for src in range(host_start, host_end):
-                if target_edges is not None:
-                    out_deg = _target_out_degree(src, total_nodes, target_edges)
-                else:
-                    out_deg = _out_degree(degree_model, avg_out_degree, rng)
+                out_deg = _out_degree(degree_model, avg_out_degree, rng)
 
                 for _ in range(out_deg):
                     x = float(rng.random())
@@ -346,7 +331,6 @@ def generate_edge_list_parallel(
     total_nodes: int,
     workers: int,
     avg_out_degree: int,
-    target_edges: int | None,
     degree_model: str,
     p_same_subdomain: float,
     p_same_domain_other_subdomain: float,
@@ -375,7 +359,6 @@ def generate_edge_list_parallel(
                         domain_ends,
                         total_nodes,
                         avg_out_degree,
-                        target_edges,
                         degree_model,
                         p_same_subdomain,
                         p_same_domain_other_subdomain,
@@ -428,12 +411,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--edge-output", default="data/synthetic-web-subdomains.txt")
     parser.add_argument("--metadata-output", default="data/synthetic-web-subdomains-nodes.csv")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument(
-        "--target-edges",
-        type=int,
-        default=None,
-        help="Exact number of edges to generate. Overrides --avg-out-degree when set.",
-    )
 
     parser.add_argument("--n-domains", type=int, default=8)
     parser.add_argument("--min-subdomains", type=int, default=3)
@@ -470,8 +447,6 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("Invalid pages-per-subdomain range")
     if args.avg_out_degree < 1:
         raise ValueError("--avg-out-degree must be >= 1")
-    if args.target_edges is not None and args.target_edges < 1:
-        raise ValueError("--target-edges must be >= 1")
     if args.workers < 1:
         raise ValueError("--workers must be >= 1")
 
@@ -510,7 +485,6 @@ def main() -> None:
             domain_ends=domain_ends,
             total_nodes=total_nodes,
             avg_out_degree=args.avg_out_degree,
-            target_edges=args.target_edges,
             degree_model=args.degree_model,
             p_same_subdomain=args.p_same_subdomain,
             p_same_domain_other_subdomain=args.p_same_domain_other_subdomain,
@@ -526,7 +500,6 @@ def main() -> None:
             total_nodes=total_nodes,
             workers=args.workers,
             avg_out_degree=args.avg_out_degree,
-            target_edges=args.target_edges,
             degree_model=args.degree_model,
             p_same_subdomain=args.p_same_subdomain,
             p_same_domain_other_subdomain=args.p_same_domain_other_subdomain,
@@ -538,8 +511,6 @@ def main() -> None:
 
     print(f"Generated nodes: {generated_nodes}")
     print(f"Generated edges: {generated_edges}")
-    if args.target_edges is not None:
-        print(f"Target edges: {args.target_edges}")
     print(f"Unique blocks (hosts): {len(hosts)}")
     print(f"Workers used for edges: {args.workers}")
     print(f"Edge list: {edge_output}")
