@@ -13,17 +13,40 @@ os.makedirs(OUT_DIR, exist_ok=True)
 # ----------------------------
 data = []
 
-pattern_dataset = re.compile(r"synth_(\d+)([mk])_(\d+)([mk])")
+pattern_dataset = re.compile(r"synth_([0-9]+(?:\.[0-9]+)?)([mk])_([0-9]+(?:\.[0-9]+)?)([mk])")
 pattern_method = re.compile(r"\[(.*?)\]")
-pattern_time = re.compile(r"Total.*time:\s*([0-9.]+)")
+pattern_time = re.compile(
+    r"(?:(?:Total.*time)|(?:Time for .*?))(?:\s*:\s*|\s+)([0-9.]+)s?"
+)
+pattern_dataset_path = re.compile(
+    r"data/synth_([0-9]+(?:\.[0-9]+)?)([mk])_([0-9]+(?:\.[0-9]+)?)([mk])\.txt"
+)
 
 def parse_count(value, suffix):
-    value = int(value)
+    value = float(value)
     if suffix == "m":
-        return value * 1_000_000
+        return int(value * 1_000_000)
     elif suffix == "k":
-        return value * 1_000
-    return value
+        return int(value * 1_000)
+    return int(value)
+
+
+def extract_nodes_edges(lines, filename):
+    """Try hard to recover node/edge counts from log text or filename."""
+    for line in lines:
+        match = pattern_dataset.search(line)
+        if match:
+            nodes = parse_count(match.group(1), match.group(2))
+            edges = parse_count(match.group(3), match.group(4))
+            return nodes, edges
+
+    match = pattern_dataset_path.search(filename)
+    if match:
+        nodes = parse_count(match.group(1), match.group(2))
+        edges = parse_count(match.group(3), match.group(4))
+        return nodes, edges
+
+    return None, None
 
 for file in os.listdir(LOG_DIR):
     if not file.endswith(".log"):
@@ -34,11 +57,10 @@ for file in os.listdir(LOG_DIR):
     with open(path) as f:
         lines = f.readlines()
 
-    dataset_line = next(l for l in lines if "Dataset:" in l)
-    match = pattern_dataset.search(dataset_line)
-
-    nodes = parse_count(match.group(1), match.group(2))
-    edges = parse_count(match.group(3), match.group(4))
+    nodes, edges = extract_nodes_edges(lines, file)
+    if nodes is None or edges is None:
+        print(f"Skipping {file}: could not determine dataset size")
+        continue
 
     current_method = None
 
