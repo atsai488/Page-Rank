@@ -1,0 +1,72 @@
+==================================================
+Dataset: data/synth_2m_20m.txt
+Metadata: data/synth_2m_20m_nodes.csv
+workers=4, chunk=64, blocks=100
+==================================================
+[BlockRank+Coloring]
+Args: {'dataset': 'data/synth_2m_20m.txt', 'metadata': 'data/synth_2m_20m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 4, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 19995739, Blocks: 100, Source: metadata (data/synth_2m_20m_nodes.csv)
+  Preprocess (group blocks):   0.0410s
+  Step 1 (local PR per block): 0.6901s
+  Step 2 (block-level PR):     0.5546s
+  Step 3 (build approximation): 0.0079s
+  Step 4 (global refinement):  0.4720s
+  Total BlockRank+Coloring time: 1.7656s
+816282     0.000001
+313083     0.000001
+1997871    0.000001
+417983     0.000001
+399515     0.000001
+431253     0.000001
+416384     0.000001
+1817322    0.000001
+1116309    0.000001
+1316548    0.000001
+dtype: float64
+[BlockRank]
+Nodes: 2000000, Edges: 19995739, Blocks: 100, Source: metadata (data/synth_2m_20m_nodes.csv)
+  Preprocess (group blocks):   0.0417s
+  Step 1 (local PR per block): 0.8993s
+  Step 2 (block-level PR):     0.5098s
+  Step 3 (build approximation): 0.0076s
+  Step 4 (global refinement):  0.6125s
+  Total BlockRank time:        2.0710s
+816282     0.000001
+313083     0.000001
+1997871    0.000001
+417983     0.000001
+399515     0.000001
+431253     0.000001
+416384     0.000001
+1817322    0.000001
+1116309    0.000001
+1316548    0.000001
+dtype: float64
+[Coloring]
+Converged in 68 iterations
+Total time: 2.1574s
+816282     0.000001
+313083     0.000001
+1997871    0.000001
+417983     0.000001
+399515     0.000001
+416384     0.000001
+431253     0.000001
+1817322    0.000001
+1116309    0.000001
+1316548    0.000001
+dtype: float64
+[Basic]
+Time for power iteration 4.665709495544434
+816282     0.000001
+313083     0.000001
+1997871    0.000001
+417983     0.000001
+399515     0.000001
+416384     0.000001
+431253     0.000001
+1817322    0.000001
+1116309    0.000001
+1316548    0.000001
+dtype: float64
+
