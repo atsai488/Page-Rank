@@ -1,10 +1,10 @@
 ==================================================
 Dataset: data/web-BerkStan.txt
-blocks=10, workers=4, chunk=64
+blocks=10, workers=8, chunk=64
 ==================================================
 [Coloring]
 Converged in 106 iterations
-Total time: 1.1528s
+Total time: 1.7987s
 272919    0.009457
 438238    0.007487
 210376    0.005101
@@ -17,14 +17,14 @@ Total time: 1.1528s
 401873    0.002263
 dtype: float64
 [BlockRank+Coloring]
-Args: {'dataset': 'data/web-BerkStan.txt', 'metadata': None, 'num_blocks': 10, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 4, 'local_chunk_size': 64}
+Args: {'dataset': 'data/web-BerkStan.txt', 'metadata': None, 'num_blocks': 10, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 8, 'local_chunk_size': 64}
 Nodes: 685230, Edges: 7600595, Blocks: 10, Source: index buckets (10 target blocks)
-  Preprocess (group blocks):   0.0103s
-  Step 1 (local PR per block): 1.0705s
-  Step 2 (block-level PR):     0.2027s
-  Step 3 (build approximation): 0.0047s
-  Step 4 (global refinement):  0.1836s
-  Total BlockRank+Coloring time: 1.4719s
+  Preprocess (group blocks):   0.0107s
+  Step 1 (local PR per block): 1.0965s
+  Step 2 (block-level PR):     0.2012s
+  Step 3 (build approximation): 0.0043s
+  Step 4 (global refinement):  0.1545s
+  Total BlockRank+Coloring time: 1.4673s
 272919    0.009376
 438238    0.007486
 210376    0.005114
@@ -39,11 +39,11 @@ dtype: float64
 [BlockRank]
 Nodes: 685230, Edges: 7600595, Blocks: 10, Source: index buckets (10 target blocks)
   Preprocess (group blocks):   0.0102s
-  Step 1 (local PR per block): 1.0702s
-  Step 2 (block-level PR):     0.2054s
-  Step 3 (build approximation): 0.0026s
-  Step 4 (global refinement):  0.3762s
-  Total BlockRank time:        1.6647s
+  Step 1 (local PR per block): 1.0655s
+  Step 2 (block-level PR):     0.2061s
+  Step 3 (build approximation): 0.0029s
+  Step 4 (global refinement):  0.5741s
+  Total BlockRank time:        1.8588s
 272919    0.009376
 438238    0.007486
 210376    0.005114
@@ -56,7 +56,7 @@ Nodes: 685230, Edges: 7600595, Blocks: 10, Source: index buckets (10 target bloc
 401873    0.002262
 dtype: float64
 [Basic]
-Time for power iteration 1.796114444732666
+Time for power iteration 1.8609881401062012
 272919    0.009457
 438238    0.007487
 210376    0.005101

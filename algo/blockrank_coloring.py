@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit, prange, set_num_threads
 from scipy.sparse import csr_matrix
 
-_n_threads = min(8, int(os.environ.get("SLURM_CPUS_PER_TASK", os.cpu_count() or 1)))
+_n_threads = max(1, int(os.environ.get("SLURM_CPUS_PER_TASK", os.cpu_count() or 1)))
 set_num_threads(_n_threads)
 
 

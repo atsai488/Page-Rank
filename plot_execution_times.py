@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-LOG_DIR = "logs_4w_64_chunk"
+LOG_DIR = "logs_8w_4_chunk"
 OUT_DIR = "viz"
 
 os.makedirs(OUT_DIR, exist_ok=True)

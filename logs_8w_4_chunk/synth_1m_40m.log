@@ -1,0 +1,72 @@
+==================================================
+Dataset: data/synth_1m_40m.txt
+Metadata: data/synth_1m_40m_nodes.csv
+workers=8, chunk=4, blocks=100
+==================================================
+[Coloring]
+Converged in 66 iterations
+Total time: 2.7245s
+686398    0.000002
+932258    0.000002
+977972    0.000002
+509983    0.000002
+957057    0.000002
+941120    0.000002
+545208    0.000002
+680387    0.000002
+629524    0.000002
+785917    0.000002
+dtype: float64
+[BlockRank+Coloring]
+Args: {'dataset': 'data/synth_1m_40m.txt', 'metadata': 'data/synth_1m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 8, 'local_chunk_size': 4}
+Nodes: 1000000, Edges: 39926679, Blocks: 100, Source: metadata (data/synth_1m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0173s
+  Step 1 (local PR per block): 0.2782s
+  Step 2 (block-level PR):     1.0072s
+  Step 3 (build approximation): 0.0047s
+  Step 4 (global refinement):  0.6055s
+  Total BlockRank+Coloring time: 1.9129s
+686398    0.000002
+932258    0.000002
+977972    0.000002
+957057    0.000002
+509983    0.000002
+941120    0.000002
+545208    0.000002
+680387    0.000002
+629524    0.000002
+785917    0.000002
+dtype: float64
+[BlockRank]
+Nodes: 1000000, Edges: 39926679, Blocks: 100, Source: metadata (data/synth_1m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0157s
+  Step 1 (local PR per block): 1.2524s
+  Step 2 (block-level PR):     1.0298s
+  Step 3 (build approximation): 0.0048s
+  Step 4 (global refinement):  0.8222s
+  Total BlockRank time:        3.1250s
+686398    0.000002
+932258    0.000002
+977972    0.000002
+957057    0.000002
+509983    0.000002
+941120    0.000002
+545208    0.000002
+680387    0.000002
+629524    0.000002
+785917    0.000002
+dtype: float64
+[Basic]
+Time for power iteration 6.052493095397949
+686398    0.000002
+932258    0.000002
+977972    0.000002
+509983    0.000002
+957057    0.000002
+941120    0.000002
+545208    0.000002
+680387    0.000002
+629524    0.000002
+785917    0.000002
+dtype: float64
+

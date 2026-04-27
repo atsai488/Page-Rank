@@ -1,0 +1,26 @@
+==================================================
+Dataset: data/synth_2m_40m.txt
+Metadata: data/synth_2m_40m_nodes.csv
+blocks=100, workers=24, chunk=64
+==================================================
+[BlockRank+Coloring]
+Args: {'dataset': 'data/synth_2m_40m.txt', 'metadata': 'data/synth_2m_40m_nodes.csv', 'num_blocks': 100, 'epsilon': 1e-09, 'disable_local_parallel': False, 'local_workers': 24, 'local_chunk_size': 64}
+Nodes: 2000000, Edges: 39982089, Blocks: 100, Source: metadata (data/synth_2m_40m_nodes.csv)
+  Preprocess (group blocks):   0.0446s
+  Step 1 (local PR per block): 0.9598s
+  Step 2 (block-level PR):     1.0481s
+  Step 3 (build approximation): 0.0096s
+  Step 4 (global refinement):  0.7742s
+  Total BlockRank+Coloring time: 2.8364s
+1722450    1.072778e-06
+1222406    1.072245e-06
+1097438    1.055843e-06
+283358     1.055209e-06
+995620     1.048998e-06
+149590     1.046618e-06
+1038289    1.020463e-06
+541580     1.018624e-06
+240935     1.003032e-06
+1343798    9.986239e-07
+dtype: float64
+
